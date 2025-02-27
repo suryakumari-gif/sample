@@ -1,0 +1,364 @@
+Q) Write a jdbc application to select the student record based on student number?
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class SelectApp3 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student number :");
+		int no=sc.nextInt();
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="select * from student where sno="+no;
+		
+		ResultSet rs=st.executeQuery(qry);
+		
+		int cnt=0;
+		while(rs.next())
+		{
+			cnt=1;
+			System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
+		}
+		
+		if(cnt==0)
+			System.out.println("No Rows Selected ");
+		
+		rs.close();
+		st.close();
+		con.close();
+	}
+}
+
+
+Non-Select queries
+===================
+
+Q) Write a jdbc application to insert a record into student table?
+
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class InsertApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student no :");
+		int no=sc.nextInt();
+		
+		System.out.println("Enter the student name :");
+		String name=sc.next();
+		
+		System.out.println("Enter the student address : ");
+		String add=sc.next();
+		
+		//convert input values according to SQL query
+		name="'"+name+"'";
+		add="'"+add+"'";
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="insert into student values("+no+","+name+","+add+")";
+		
+		int result = st.executeUpdate(qry);
+		if(result==0)
+			System.out.println("No Record inserted");
+		else
+			System.out.println("Record inserted");
+		
+		st.close();
+		con.close();
+	}
+}
+
+Q) Write a jdbc application to update student name based on student no?
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class UpdateApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student no : ");
+		int no=sc.nextInt();
+		
+		System.out.println("Enter the student name :");
+		String name=sc.next();
+		
+		//convert input values according to SQL query
+		name="'"+name+"'";
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="update student set sname="+name+" where sno="+no;
+		
+		int result = st.executeUpdate(qry);
+		if(result==0)
+			System.out.println("No Record updated");
+		else
+			System.out.println("Record updated");
+		
+		st.close();
+		con.close();
+	}
+}
+
+Q) Write a jdbc application to delete student record based on student no?
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class DeleteApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student no : ");
+		int no=sc.nextInt();
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="delete from student where sno="+no;
+		
+		int result=st.executeUpdate(qry);
+		
+		if(result==0)
+			System.out.println("No Record Deleted");
+		else
+			System.out.println("Record Deleted");
+		
+		st.close();
+		con.close();
+	}
+}
+
+
+Type1 JDBC Driver Architecture / JDBC-ODBC Bridge Driver 
+=========================================================
+Type1 JDBC driver is not designed to interact with database software directly. 
+
+It is designed to take the support of ODBC Driver and Vendor DB library to locate and interact with databsae software.
+
+Diagram: jdbc3.1
+
+
+Advantages:
+
+> Using Type1 JDBC driver we can interact with any database software.
+
+> It is a built-in driver of JDK.
+
+Disadvantages:
+
+> This driver performance is low. It is not suitable for medium and large scale projects.Hence it is not a industry standard driver.
+
+> To work with Typ1 JDBC driver we need to arrange ODBC driver and Vendor DB library.
+
+> Since ODBC driver and vendor db library present at client side so it is not suitable for untrusted applets to database communication.
+
+Type2 JDBC Driver Architecture / Native API 
+=============================================
+Type2 JDBC driver is not designed to interact with database software directly.
+
+It is designed to interact with vendor db library to locate and interact with database software.
+
+Diagram: jdbc3.2
+
+Advantages:
+
+> Type2 JDBC driver will not take the support of ODBC driver.
+
+> Type2 jdbc driver will give better performance when compare to Type1 JDBC driver.
+
+Disadvantages:
+
+> This driver performance is quit slow. It is not suitable for medium and large scale projects.Hence it is not a industry standard driver.
+
+> To work with Typ2 JDBC driver we need to arrange vendor db library.
+
+> Since vendor db library present at client side so it is not suitable to perform untrusted applets to database communication.
+
+
+Type4 JDBC Driver Architecture /  Native Protocol (thin Driver)
+==================================================================
+Type4 JDBC driver is not designed to take the support of ODBC driver and vendor db library.
+
+It is designed to interact with database software directly.
+
+Diagram: jdbc3.3
+
+Advantages:
+
+> This driver will give better performance when compare to Type1 and Type2 jdbc driver.
+
+> It is suitable for medium and large scale projects. Hence it is a industry standard driver.
+
+> This driver will not take the support of ODBC driver and Vendor DB library.
+
+> This driver is completely developed in java so it will give platform independency.
+
+> Since odbc driver and vendor db library not present at client side so it is suitable to perform 
+  untrusted applets to database communication.
+
+Disadvantages:
+
+> It is not a built-in driver of JDK.
+
+> For every database we need to arrange Type4 JDBC driver seperately.
+
+JDBC Connection pool
+=====================
+It is a factory containing set of readabily available JDBC Connection objects before actual being used.
+
+JDBC Connection pool represent connectivity with same database software.
+
+Diagram: jdbc3.4
+
+Advantages:
+
+> It gives reusable JDBC Connection objects.
+
+> With minimum number of JDBC Connection objects we can interact with multiple clients.
+
+> A user is not responsible to create, manage and destroy JDBC Connection objects. A JDBC Connection pool is responsibile.
+
+
+Type3 JDBC Driver Architecture / Net protocol 
+=================================================
+Webserver, proxy server or IDE's server contains JDBC Connection pool.
+
+Type3 JDBC driver is designed to interact with web server or proxy server or IDE's server to get one reusable JDBC Connection object from JDBC Connection pool.
+
+Diagram: jdbc3.5
+
+With respect to the diagram:
+
+1) Web server interacts with database software and gets reusable JDBC Connection objects in JDBC Connection pool.
+
+2) Our application interacts with webserver or proxy server to get one reusable JDBC Connection object.
+
+3) Our application uses JDBC Connection object to create other Connection objects.
+
+4) Once if we call con.close() our JDBC Connection object goes back to JDBC Connection pool.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
